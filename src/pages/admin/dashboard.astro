@@ -1,0 +1,71 @@
+---
+import ProductImage from '@/components/product/ProductImage.astro';
+import Pagination from '@/components/shared/Pagination.astro';
+import MainLayout from '@/layouts/MainLayout.astro';
+import { Formatter } from '@/utils';
+import { actions } from 'astro:actions';
+
+
+
+
+const searchParam = Astro.url.searchParams;
+const pageParam = Number(searchParam.get("page") ?? 1)
+const {data, error} = await Astro.callAction(actions.getProductByPage, {page: pageParam}) 
+
+
+if(error){
+  return Astro.redirect("/")
+}
+
+const {products, totalPages} = data;
+
+
+
+---
+
+
+<MainLayout title="Panel administrativo">
+<h1>Dashboard</h1>
+<p>Listado de productos</p>
+
+
+<table class="w-full mt-5">
+    <thead>
+        <tr>
+            <th class="text-left">Imagen</th>
+            <th class="text-left">Titulo</th>
+            <th class="text-left">Precio</th>
+            <th class="text-left">Inventario</th>
+        </tr>
+    </thead>
+
+    <tbody>
+  {
+    products.map((product) =>(
+        <tr>
+         <td>
+            <ProductImage
+         src={product.images.split(",")[0]}
+         alt={product.title}
+         className="w-16 h-16"
+         />
+          </td>
+         <td>
+            <a
+                class="hover:underline cursor-progress"
+                href={`/admin/products/${product.slug}`}>
+                    {/* data-astro-prefetch="load" */}
+                    {product.title}</a> 
+        </td>
+        <td>{Formatter.currency(product.price)}</td>
+        <td>{product.stock}</td>
+            
+        </tr>
+    ))
+  }
+</tbody>
+</table>
+
+<Pagination totalPages={totalPages}/>
+
+</MainLayout>

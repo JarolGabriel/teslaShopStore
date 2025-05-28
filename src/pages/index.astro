@@ -1,11 +1,35 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import { ProductList } from '@/components';
+import Pagination from '@/components/shared/Pagination.astro';
+import MainLayout from '@/layouts/MainLayout.astro';
+import { actions } from 'astro:actions';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+
+
+const searchParam = Astro.url.searchParams;
+const pageParam = Number(searchParam.get("page") ?? 1)
+const {data, error} = await Astro.callAction(actions.getProductByPage, {page: pageParam}) 
+
+
+if(error){
+  return Astro.redirect("/")
+}
+
+const {products, totalPages} = data;
+
+if(data.products.length === 0){
+  return Astro.redirect(`/?page=${totalPages}`)
+}
+
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<MainLayout>
+<>
+  <h1 class="text-3xl">Listado de productos</h1>
+
+  <ProductList product={products} client:load/>
+
+  <Pagination totalPages={totalPages} />
+
+  
+</MainLayout>
