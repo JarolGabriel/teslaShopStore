@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+/* imagen del producto */
+
+.btn-size,
+.btn-delete-image {
+  @apply rounded border cursor-pointer border-gray-300 w-10 h-10 mr-4 hover:bg-blue-300 hover:text-white transition-all;
+}
+
+.active {
+  @apply bg-blue-500 text-white;
+}
+
+.title {
+  @apply w-full text-left;
+}
